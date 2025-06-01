@@ -1,9 +1,11 @@
 package org.example.model.entities;
 
+import org.example.model.interfaces.Identifiable;
+
 import java.util.List;
 import java.util.Objects;
 
-public class Booking {
+public class Booking implements Identifiable {
     private String id;
     private String flightId;
     private List<Passenger> passengers;
