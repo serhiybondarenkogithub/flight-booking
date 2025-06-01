@@ -1,6 +1,6 @@
 package org.example.service;
 
-import org.example.model.Flight;
+import org.example.model.entities.Flight;
 import java.util.List;
 
 public interface FlightService {

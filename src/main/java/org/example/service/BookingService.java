@@ -1,7 +1,7 @@
 package org.example.service;
 
-import org.example.model.Booking;
-import org.example.model.Passenger;
+import org.example.model.entities.Booking;
+import org.example.model.entities.Passenger;
 import java.util.List;
 
 public interface BookingService {

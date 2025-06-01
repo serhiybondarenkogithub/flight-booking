@@ -1,9 +1,12 @@
-package org.example.model;
+package org.example.model.entities;
 
+import org.example.model.interfaces.Identifiable;
+
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class Flight {
+public class Flight implements Identifiable, Serializable {
     private String id;
     private String destination;
     private LocalDateTime departureTime;

@@ -1,12 +1,11 @@
+
 package org.example.dao;
 
-import org.example.model.Flight;
-import java.util.List;
-import java.util.Optional;
+import org.example.model.entities.Flight;
+import org.example.dao.storage.ListStorage;
 
-public interface FlightDao {
-    List<Flight> findAll();
-    Optional<Flight> findById(String id);
-    void saveAll(List<Flight> flights);
-    void update(Flight flight);
+public abstract class FlightDao extends AbstractDao<Flight> {
+    public FlightDao(ListStorage<Flight> storage, Class<Flight> entityClass) {
+        super(storage);
+    }
 }
