@@ -1,6 +1,6 @@
 package org.example.dao;
 
-import org.example.model.Booking;
+import org.example.model.entities.Booking;
 import java.util.List;
 import java.util.Optional;
 

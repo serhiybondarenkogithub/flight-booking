@@ -1,6 +1,6 @@
 package org.example.dao;
 
-import org.example.model.Passenger;
+import org.example.model.entities.Passenger;
 import java.util.List;
 
 public interface PassengerDao {
