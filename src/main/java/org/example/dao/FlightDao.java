@@ -3,7 +3,7 @@ package org.example.dao;
 import org.example.exception.DaoException;
 import org.example.exception.StorageException;
 import org.example.model.entities.Flight;
-import org.example.storage.Storage;
+import org.example.dao.storage.Storage;
 
 import java.util.List;
 import java.util.Optional;

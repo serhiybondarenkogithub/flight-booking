@@ -1,4 +1,4 @@
-package org.example.storage;
+package org.example.dao.storage;
 
 import org.example.exception.StorageException;
 
