@@ -5,10 +5,10 @@ import org.example.exception.StorageException;
 import java.io.*;
 import java.util.List;
 
-public class FileToListStorage<T> implements Storage<T> {
+public class FileListStorage<T> implements ListStorage<T> {
     private final File file;
 
-    public FileToListStorage(File file) {
+    public FileListStorage(File file) {
         if (file == null) throw new IllegalArgumentException("File cannot be null");
         this.file = file;
     }

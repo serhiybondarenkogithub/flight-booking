@@ -3,15 +3,15 @@ package org.example.dao;
 import org.example.exception.DaoException;
 import org.example.exception.StorageException;
 import org.example.model.entities.Flight;
-import org.example.dao.storage.Storage;
+import org.example.dao.storage.ListStorage;
 
 import java.util.List;
 import java.util.Optional;
 
 public class FlightDao implements Dao<Flight> {
-    private final Storage<Flight> storage;
+    private final ListStorage<Flight> storage;
 
-    public FlightDao(Storage<Flight> storage) {
+    public FlightDao(ListStorage<Flight> storage) {
         this.storage = storage;
     }
 
