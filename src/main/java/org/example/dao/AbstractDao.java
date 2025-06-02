@@ -2,12 +2,14 @@ package org.example.dao;
 
 import org.example.exception.DaoException;
 import org.example.exception.StorageException;
-import org.example.model.entities.Flight;
 import org.example.model.interfaces.Identifiable;
 import org.example.dao.storage.ListStorage;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.IntStream;
 
 public abstract class AbstractDao<T extends Identifiable> implements Dao<T> {
     protected final ListStorage<T> storage;
@@ -30,9 +32,15 @@ public abstract class AbstractDao<T extends Identifiable> implements Dao<T> {
 
     @Override
     public void createAll(List<T> entities) throws DaoException {
-        if (entities == null || entities.contains(null)) {
-            throw new DaoException(entityClass.getSimpleName() + " list is null or contains null");
+        if (entities == null) {
+            throw new DaoException(entityClass.getSimpleName() + " list is null");
         }
+        OptionalInt nullIndex = IntStream.range(0, entities.size())
+                .filter(i -> entities.get(i) == null)
+                .findFirst();
+
+        if (nullIndex.isPresent()) { throw new DaoException("List contains null at index " + nullIndex.getAsInt()); }
+
         List<T> list = safeLoad();
         list.addAll(entities);
         safeSave(list);
@@ -60,15 +68,13 @@ public abstract class AbstractDao<T extends Identifiable> implements Dao<T> {
     public void update(T entity) throws DaoException {
         if (entity == null) throw new DaoException("Cannot update null "+ entityClass.getSimpleName());
         List<T> list = safeLoad();
-        boolean updated = false;
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).getId().equals(entity.getId())) {
-                list.set(i, entity);
-                updated = true;
-                break;
-            }
-        }
-        if (!updated) {
+        OptionalInt indexOpt = IntStream.range(0, list.size())
+                .filter(i -> list.get(i).getId().equals(entity.getId()))
+                .findFirst();
+
+        if (indexOpt.isPresent()) {
+            list.set(indexOpt.getAsInt(), entity);
+        } else {
             throw new DaoException(entityClass.getSimpleName() + " with id " + entity.getId() + " not found");
         }
         safeSave(list);
@@ -76,7 +82,9 @@ public abstract class AbstractDao<T extends Identifiable> implements Dao<T> {
 
     @Override
     public void delete(String id) throws DaoException {
-        if (id == null) throw new DaoException("Cannot delete " + entityClass.getSimpleName() + ": id is null");
+        if (id == null || id.isBlank()) {
+            throw new DaoException("Cannot delete " + entityClass.getSimpleName() + ": id is null or blank");
+        }
         List<T> list = safeLoad();
         boolean removed = list.removeIf(obj -> obj.getId().equals(id));
         if (!removed) {

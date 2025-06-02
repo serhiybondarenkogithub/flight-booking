@@ -15,10 +15,10 @@ public class FlightTest {
         Flight flight = new Flight("FL123", "Kyiv", "Berlin", depTime, arrTime, 100);
 
         assertEquals("FL123", flight.id());
-        assertEquals("Kyiv", flight.departure());
-        assertEquals("Berlin", flight.destination());
-        assertEquals(depTime, flight.departureTime());
-        assertEquals(arrTime, flight.destinationTime());
+        assertEquals("Kyiv", flight.from());
+        assertEquals("Berlin", flight.to());
+        assertEquals(depTime, flight.departureDateTime());
+        assertEquals(arrTime, flight.arrivalDateTime());
         assertEquals(100, flight.availableSeats());
     }
 
