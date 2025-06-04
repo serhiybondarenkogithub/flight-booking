@@ -5,6 +5,7 @@ import org.example.exception.StorageException;
 import org.example.model.interfaces.Identifiable;
 import org.example.dao.storage.ListStorage;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -21,7 +22,11 @@ public abstract class AbstractDao<T extends Identifiable> implements Dao<T> {
     }
 
     protected List<T> safeLoad() throws DaoException {
-        try { return storage.loadData(); }
+        try {
+            List<T> data = storage.loadData();
+            if (data == null) throw new DaoException(this.getClass().getSimpleName() + ": null data returned from storage");
+            return data;
+        }
         catch (StorageException e) { throw new DaoException(this.getClass().getSimpleName() + ": " + e.getMessage(), e); }
     }
 
@@ -95,6 +100,6 @@ public abstract class AbstractDao<T extends Identifiable> implements Dao<T> {
 
     @Override
     public List<T> readAll() throws DaoException {
-        return safeLoad();
+        return Collections.unmodifiableList(safeLoad());
     }
 }
