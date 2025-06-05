@@ -8,6 +8,7 @@ import java.util.Objects;
 
 public record Flight(
         String id,
+        String flightCode,
         String from,
         String to,
         LocalDateTime departureDateTime,
@@ -16,7 +17,7 @@ public record Flight(
 ) implements Identifiable, Serializable {
 
     public Flight {
-        if (id == null || from == null || to == null || departureDateTime == null || arrivalDateTime == null)
+        if (id == null || flightCode == null || from == null || to == null || departureDateTime == null || arrivalDateTime == null)
             throw new IllegalArgumentException("Flight parameters cannot be null");
 
         validateSeats(availableSeats);
@@ -24,7 +25,7 @@ public record Flight(
 
     public Flight withAvailableSeats(int newSeats) {
         validateSeats(newSeats);
-        return new Flight(id, from, to, departureDateTime, arrivalDateTime, newSeats);
+        return new Flight(id, flightCode, from, to, departureDateTime, arrivalDateTime, newSeats);
     }
 
     private void validateSeats(int seats) {

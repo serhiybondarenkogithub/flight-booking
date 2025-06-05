@@ -37,7 +37,7 @@ public class FlightDaoTest {
     @BeforeEach
     void setUp() {
         flight = new Flight(
-                "FL123", "Kyiv", "Warsaw",
+                "FL123", "", "Kyiv", "Warsaw",
                     LocalDateTime.of(2025, 6, 1, 10, 0),
                 LocalDateTime.of(2025, 6, 1, 12, 0),
                 120
@@ -54,12 +54,12 @@ public class FlightDaoTest {
             List<Flight> existingFlights = new ArrayList<>();
             when(storage.loadData()).thenReturn(existingFlights);
 
-            Flight flight1 = new Flight("FL001", "Kyiv", "Berlin",
+            Flight flight1 = new Flight("FL001", "", "Kyiv", "Berlin",
                     LocalDateTime.of(2025, 6, 1, 8, 0),
                     LocalDateTime.of(2025, 6, 1, 10, 0),
                     100);
 
-            Flight flight2 = new Flight("FL002", "Kyiv", "Paris",
+            Flight flight2 = new Flight("FL002", "", "Kyiv", "Paris",
                     LocalDateTime.of(2025, 6, 2, 9, 0),
                     LocalDateTime.of(2025, 6, 2, 12, 0),
                     90);
@@ -84,7 +84,7 @@ public class FlightDaoTest {
             List<Flight> existingFlights = new ArrayList<>();
             when(storage.loadData()).thenReturn(existingFlights);
 
-            Flight flightDuplicate = new Flight("FL123", "Odessa", "London",
+            Flight flightDuplicate = new Flight("FL123", "", "Odessa", "London",
                     LocalDateTime.of(2025, 6, 1, 10, 0),
                     LocalDateTime.of(2025, 6, 1, 12, 0),
                     120);
@@ -103,7 +103,7 @@ public class FlightDaoTest {
 
             List<Flight> bulkFlights = new ArrayList<>();
             for (int i = 0; i < 10_000; i++) {
-                bulkFlights.add(new Flight("FL" + i, "A", "B",
+                bulkFlights.add(new Flight("FL" + i, "", "A", "B",
                         LocalDateTime.now(), LocalDateTime.now().plusHours(1), 100));
             }
 
@@ -370,7 +370,7 @@ public class FlightDaoTest {
             when(storage.loadData()).thenReturn(flights);
 
             Flight unknownFlight = new Flight(
-                    "UNKNOWN_ID", "Lviv", "Rome",
+                    "UNKNOWN_ID", "", "Lviv", "Rome",
                     LocalDateTime.of(2025, 7, 1, 6, 0),
                     LocalDateTime.of(2025, 7, 1, 9, 0),
                     50
@@ -386,14 +386,14 @@ public class FlightDaoTest {
         @Test
         @DisplayName("Update should replace all fields except id")
         void testUpdate_replacesAllFieldsExceptId() throws Exception {
-            Flight original = new Flight("FL123", "Kyiv", "Warsaw",
+            Flight original = new Flight("FL123", "", "Kyiv", "Warsaw",
                     LocalDateTime.of(2025, 6, 1, 10, 0),
                     LocalDateTime.of(2025, 6, 1, 12, 0), 120);
 
             List<Flight> flights = new ArrayList<>(List.of(original));
             when(storage.loadData()).thenReturn(flights);
 
-            Flight updated = new Flight("FL123", "Lviv", "London",
+            Flight updated = new Flight("FL123", "", "Lviv", "London",
                     LocalDateTime.of(2025, 6, 5, 8, 0),
                     LocalDateTime.of(2025, 6, 5, 11, 0), 95);
 
@@ -513,14 +513,14 @@ public class FlightDaoTest {
             assertEquals(flight, result.get(0));
 
             assertThrows(UnsupportedOperationException.class, () -> result.add(
-                    new Flight("FL999", "Lviv", "Rome", LocalDateTime.now(), LocalDateTime.now().plusHours(2), 100)
+                    new Flight("FL999", "", "Lviv", "Rome", LocalDateTime.now(), LocalDateTime.now().plusHours(2), 100)
             ));
         }
 
         @Test
         @DisplayName("Returns list with multiple flights")
         void testReadAll_multipleFlights() throws Exception {
-            List<Flight> flights = List.of(flight, new Flight("FL999", "Lviv", "Berlin",
+            List<Flight> flights = List.of(flight, new Flight("FL999", "", "Lviv", "Berlin",
                     LocalDateTime.now(), LocalDateTime.now().plusHours(2), 80));
             when(storage.loadData()).thenReturn(flights);
 
@@ -535,7 +535,7 @@ public class FlightDaoTest {
         void testReadAll_largeDataset() throws Exception {
             List<Flight> bigList = new ArrayList<>();
             for (int i = 0; i < 100_000; i++) {
-                bigList.add(new Flight("FL" + i, "A", "B", LocalDateTime.now(), LocalDateTime.now().plusHours(1), 100));
+                bigList.add(new Flight("FL" + i, "", "A", "B", LocalDateTime.now(), LocalDateTime.now().plusHours(1), 100));
             }
             when(storage.loadData()).thenReturn(bigList);
 

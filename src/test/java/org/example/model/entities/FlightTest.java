@@ -12,7 +12,7 @@ public class FlightTest {
 
     @Test
     void shouldCreateFlightSuccessfully() {
-        Flight flight = new Flight("FL123", "Kyiv", "Berlin", depTime, arrTime, 100);
+        Flight flight = new Flight("FL123", "", "Kyiv", "Berlin", depTime, arrTime, 100);
 
         assertEquals("FL123", flight.id());
         assertEquals("Kyiv", flight.from());
@@ -25,7 +25,7 @@ public class FlightTest {
     @Test
     void shouldThrowExceptionForNegativeSeats() {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                new Flight("FL123", "Kyiv", "Berlin", depTime, arrTime, -5)
+                new Flight("FL123", "", "Kyiv", "Berlin", depTime, arrTime, -5)
         );
         assertEquals("Available seats cannot be negative", exception.getMessage());
     }
@@ -34,20 +34,20 @@ public class FlightTest {
     @Test
     void shouldThrowExceptionForNullFields() {
         assertThrows(IllegalArgumentException.class, () ->
-                new Flight(null, "Kyiv", "Berlin", depTime, arrTime, 50));
+                new Flight(null, "", "Kyiv", "Berlin", depTime, arrTime, 50));
         assertThrows(IllegalArgumentException.class, () ->
-                new Flight("FL123", null, "Berlin", depTime, arrTime, 50));
+                new Flight("FL123", "", null, "Berlin", depTime, arrTime, 50));
         assertThrows(IllegalArgumentException.class, () ->
-                new Flight("FL123", "Kyiv", null, depTime, arrTime, 50));
+                new Flight("FL123", "", "Kyiv", null, depTime, arrTime, 50));
         assertThrows(IllegalArgumentException.class, () ->
-                new Flight("FL123", "Kyiv", "Berlin", null, arrTime, 50));
+                new Flight("FL123", "", "Kyiv", "Berlin", null, arrTime, 50));
         assertThrows(IllegalArgumentException.class, () ->
-                new Flight("FL123", "Kyiv", "Berlin", depTime, null, 50));
+                new Flight("FL123", "", "Kyiv", "Berlin", depTime, null, 50));
     }
 
     @Test
     void withAvailableSeatsShouldReturnNewInstance() {
-        Flight original = new Flight("FL123", "Kyiv", "Berlin", depTime, arrTime, 100);
+        Flight original = new Flight("FL123", "", "Kyiv", "Berlin", depTime, arrTime, 100);
         Flight modified = original.withAvailableSeats(50);
 
         assertNotSame(original, modified);
@@ -57,7 +57,7 @@ public class FlightTest {
 
     @Test
     void withAvailableSeatsShouldThrowExceptionForNegative() {
-        Flight flight = new Flight("FL123", "Kyiv", "Berlin", depTime, arrTime, 100);
+        Flight flight = new Flight("FL123", "", "Kyiv", "Berlin", depTime, arrTime, 100);
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
                 flight.withAvailableSeats(-1)
