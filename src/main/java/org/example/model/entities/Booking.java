@@ -16,9 +16,17 @@ public class Booking implements Identifiable {
         this.passengers = passengers;
     }
 
-    public String getId() { return id; }
-    public String getFlightId() { return flightId; }
-    public List<Passenger> getPassengers() { return passengers; }
+    public String getId() {
+        return id;
+    }
+
+    public String getFlightId() {
+        return flightId;
+    }
+
+    public List<Passenger> getPassengers() {
+        return passengers;
+    }
 
     @Override
     public boolean equals(Object o) {

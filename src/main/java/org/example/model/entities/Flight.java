@@ -33,6 +33,10 @@ public record Flight(
         }
     }
 
+    public LocalDateTime getDepartureTime() {
+        return departureDateTime;
+    }
+
     @Override
     public String getId() {
         return id;

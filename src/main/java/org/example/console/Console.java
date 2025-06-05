@@ -23,19 +23,21 @@ public class Console {
                 int choice = Integer.parseInt(scanner.nextLine());
                 switch (choice) {
                     case 1:
-//                        flightController.showBoard();
+                        flightController.showBoard();
                         break;
                     case 2:
-//                        flightController.showFlightInfo(scanner);
+                        System.out.print("Введіть ID рейсу: ");
+                        String flightId = scanner.nextLine();
+                        flightController.showFlightInfo(flightId);
                         break;
                     case 3:
-//                        bookingController.searchAndBook(scanner);
+                        bookingController.searchAndBook();
                         break;
                     case 4:
-//                        bookingController.cancelBooking(scanner);
+                        bookingController.cancelBooking(scanner);
                         break;
                     case 5:
-//                        bookingController.showMyBookings(scanner);
+                        bookingController.showMyBookings(scanner);
                         break;
                     case 6:
                         System.out.println("Вихід...");

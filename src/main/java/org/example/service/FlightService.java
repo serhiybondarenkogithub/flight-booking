@@ -8,6 +8,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import java.util.Map;
+import java.util.HashMap;
+
+
 public class FlightService {
     private FlightDao dao;
     private List<Flight> flights;
@@ -18,12 +22,10 @@ public class FlightService {
     }
 
     public void SaveFlights() {
-//        FlightsGenerator flightsGenerator = new FlightsGenerator(100);
-//        flights = flightsGenerator.getFlights();
         try {
             dao.createAll(flights);
         } catch (DaoException e) {
-            System.out.println(e);;
+            System.out.println(e);
         }
     }
 
@@ -32,6 +34,7 @@ public class FlightService {
             return dao.readAll();
         } catch (DaoException e) {
             System.out.println(e);
+            return List.of();
         }
     }
 
@@ -44,9 +47,18 @@ public class FlightService {
 
     public Flight getFlightById(String id) throws IllegalStateException {
         try {
-            return dao.read(id);
+            return dao.read(id).orElseThrow(() -> new IllegalStateException("Flight not found: " + id));
         } catch (DaoException e) {
-            System.out.println(e);;
+            System.out.println(e);
+            throw new IllegalStateException("Error reading flight", e);
+        }
+    }
+
+    public void updateFlight(Flight flight) {
+        try {
+            dao.update(flight);
+        } catch (DaoException e) {
+            System.out.println(e);
         }
     }
 }
