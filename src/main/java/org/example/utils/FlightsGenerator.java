@@ -12,6 +12,53 @@ import java.util.stream.IntStream;
 
 public class FlightsGenerator {
     private static final Faker faker = new Faker();
+    private static final String[] CITIES = {
+            "Kyiv",         // Ukraine
+            "Lviv",
+            "Odesa",
+            "Dnipro",
+            "Kharkiv",
+            "Warsaw",       // Poland
+            "Krakow",
+            "Prague",       // Czechia
+            "Budapest",     // Hungary
+            "Bucharest",    // Romania
+            "Sofia",        // Bulgaria
+            "Vienna",       // Austria
+            "Frankfurt",    // Germany
+            "Munich",
+            "Paris",        // France
+            "Amsterdam",    // Netherlands
+            "Brussels",     // Belgium
+            "Zurich",       // Switzerland
+            "Copenhagen",   // Denmark
+            "Stockholm",    // Sweden
+            "Oslo",         // Norway
+            "Helsinki",     // Finland
+            "London",       // UK
+            "Dublin",       // Ireland
+            "Madrid",       // Spain
+            "Barcelona",
+            "Rome",         // Italy
+            "Milan",
+            "Athens",       // Greece
+            "Istanbul",     // Türkiye
+            "Doha",         // Qatar
+            "Dubai",        // UAE
+            "Abu Dhabi",
+            "Delhi",        // India
+            "Mumbai",
+            "Tokyo",        // Japan
+            "Seoul",        // South Korea
+            "Singapore",    // Singapore
+            "Bangkok",      // Thailand
+            "New York",     // USA
+            "Los Angeles",
+            "Chicago",
+            "Toronto",      // Canada
+            "Montreal",
+            "São Paulo"     // Brazil
+    };
 
     public static List<Flight> init(int num) {
         return IntStream.range(0, num).mapToObj(i -> generateFlight()).toList();
@@ -22,15 +69,15 @@ public class FlightsGenerator {
 
         String flightCode = generateFlightCode();
 
-        String from = faker.address().cityName();
+        String from = faker.bool().bool() ? "Kyiv" : faker.options().option(CITIES);;
 
         String to;
         do {
-            to = faker.address().cityName();
+            to = faker.options().option(CITIES);;
         } while (to.equals(from));
 
         int seats = faker.number().numberBetween(100, 301);
-        LocalDateTime departureDateTime = LocalDateTime.ofInstant(faker.date().future(30, TimeUnit.DAYS).toInstant(), ZoneId.systemDefault());
+        LocalDateTime departureDateTime = LocalDateTime.ofInstant(faker.date().future(24, TimeUnit.HOURS).toInstant(), ZoneId.systemDefault());
         LocalDateTime arrivalDateTime = departureDateTime.plusHours(faker.number().numberBetween(1, 12));
 
         return new Flight(id, flightCode, from, to, departureDateTime, arrivalDateTime, seats);

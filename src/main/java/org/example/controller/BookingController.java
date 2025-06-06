@@ -21,11 +21,31 @@ public class BookingController {
     }
 
     public void cancelBooking(Scanner scanner) {
-        System.out.print("Enter flight ID: ");
-        String flightId = scanner.nextLine();
-        System.out.print("Enter passenger ID: ");
+        System.out.print("Введіть код рейсу: ");
+        String flightCode = scanner.nextLine();
+        List<Flight> found = flightService.getFlightsByFlightCode(flightCode);
+        if (found.isEmpty()) {
+            System.out.println("Рейс не знайдено.");
+            System.out.println("Повертаємось до головного меню...");
+            return;
+        }
+        FlightController.printFligsWithIndexes(found);
+        System.out.println("Введіть номер рейсу (число): ");
+        int choice = Integer.parseInt(scanner.nextLine());
+        if (choice == 0) {
+            System.out.println("Повертаємось до головного меню...");
+            return;
+        }
+        System.out.println("0. Повернутися до головного меню");
+        System.out.print("Ореріть рейс для бронювання (число): ");
+        if (choice < 1 || choice > found.size()) {
+            System.out.println("Некоректний вибір.");
+            return;
+        }
+        Flight flight = found.get(choice - 1);
+        System.out.print("Введіть ID пасажира: ");
         String passengerId = scanner.nextLine();
-        bookingService.cancelBookingByFlightAndPassenger(flightId, passengerId);
+        bookingService.cancelBookingByFlightAndPassenger(flight.id(), passengerId);
     }
 
     public void showMyBookings(Scanner scanner) {
@@ -35,33 +55,31 @@ public class BookingController {
     }
 
     public void searchAndBook() {
-        System.out.print("Enter departure city: ");
+        System.out.print("Введіть місто відпавлення: ");
         String from = scanner.nextLine();
-        System.out.print("Enter destination: ");
+        System.out.print("Введіть місце призначення: ");
         String to = scanner.nextLine();
-        System.out.print("Enter date (YYYY-MM-DD): ");
+        System.out.print("Введіть дату (у форматі YYYY-MM-DD): ");
         String date = scanner.nextLine();
-        System.out.print("Enter number of passengers: ");
+        System.out.print("Введіть число пасажирів: ");
         int passengerCount = Integer.parseInt(scanner.nextLine());
 
         List<Flight> found = flightService.getFlightsByParams(from, to, java.time.LocalDate.parse(date), passengerCount);
         if (found.isEmpty()) {
-            System.out.println("No flights found.");
-            System.out.println("Returning to main menu...");
+            System.out.println("Рейс не знайдено.");
+            System.out.println("Повертаємось до головного меню...");
             return;
         }
-        for (int i = 0; i < found.size(); i++) {
-            System.out.println((i + 1) + ". " + found.get(i));
-        }
-        System.out.println("0. Return to main menu");
-        System.out.print("Choose a flight to book (number): ");
+        FlightController.printFligsWithIndexes(found);
+        System.out.println("0. Повернутися до головного меню");
+        System.out.print("Ореріть рейс для бронювання (число): ");
         int choice = Integer.parseInt(scanner.nextLine());
         if (choice == 0) {
-            System.out.println("Returning to main menu...");
+            System.out.println("Повертаємось до головного меню...");
             return;
         }
         if (choice < 1 || choice > found.size()) {
-            System.out.println("Invalid choice.");
+            System.out.println("Некоректний вибір.");
             return;
         }
         Flight selected = found.get(choice - 1);

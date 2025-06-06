@@ -6,7 +6,7 @@ import org.example.model.interfaces.Identifiable;
 import java.util.List;
 import java.util.Optional;
 
-public interface Dao<T extends Identifiable> {
+public interface ListDao<T extends Identifiable> {
     void createAll(List<T> entities) throws DaoException;
 
     void create(T entity) throws DaoException;

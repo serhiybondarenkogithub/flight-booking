@@ -22,6 +22,7 @@ public class FlightStorage implements ListStorage<Flight> {
                 if (parts.length != 6) continue;
                 Flight flight = new Flight(
                         parts[0],
+                        null,
                         parts[1],
                         parts[2],
                         LocalDateTime.parse(parts[3]),

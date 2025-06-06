@@ -2,10 +2,13 @@ package org.example.model.entities;
 
 import org.example.model.interfaces.Identifiable;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
-public class Booking implements Identifiable {
+public class Booking implements Identifiable, Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String id;
     private String flightId;
     private List<Passenger> passengers;

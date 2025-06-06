@@ -1,5 +1,8 @@
 package org.example.service;
 
+import org.example.dao.ListDao;
+import org.example.dao.MapDao;
+import org.example.exception.DaoException;
 import org.example.model.entities.Booking;
 import org.example.model.entities.Flight;
 import org.example.model.entities.Passenger;
@@ -8,41 +11,51 @@ import org.example.model.entities.Passenger;
 import java.util.*;
 
 public class BookingService {
-    private final Map<String, Booking> bookings = new HashMap<>();
     private final FlightService flightService;
+    private final MapDao<Booking> dao;
 
-    public BookingService(FlightService flightService) {
+    public BookingService(FlightService flightService, MapDao<Booking> dao) {
+
         this.flightService = flightService;
+        this.dao = dao;
     }
 
     public void bookSeat(Flight flight, List<Passenger> passengers) {
         if (flight.availableSeats() < passengers.size()) {
-            System.out.println("Not enough available seats on flight " + flight.id());
+            System.out.println("Недостатньо місць для бронювання рейсом " + flight.flightCode());
             return;
         }
         Flight updatedFlight = flight.withAvailableSeats(flight.availableSeats() - passengers.size());
         flightService.updateFlight(updatedFlight);
         String bookingId = UUID.randomUUID().toString();
         Booking booking = new Booking(bookingId, flight.id(), passengers);
-        bookings.put(bookingId, booking);
-        System.out.println("Booked " + passengers.size() + " seat(s) on flight " + flight.id());
+        try {
+            dao.create(bookingId, booking);
+        } catch (DaoException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("Заброньовано місць: " + passengers.size() + ". Номер рейсу: " + flight.flightCode());
     }
 
     public void cancelBookingByFlightAndPassenger(String flightId, String passengerId) {
         Booking foundBooking = null;
         Passenger foundPassenger = null;
 
-        for (Booking booking : bookings.values()) {
-            if (booking.getFlightId().equals(flightId)) {
-                for (Passenger passenger : booking.getPassengers()) {
-                    if (passenger.getId().equals(passengerId)) {
-                        foundBooking = booking;
-                        foundPassenger = passenger;
-                        break;
+        try {
+            for (Booking booking : dao.readAll().values()) {
+                if (booking.getFlightId().equals(flightId)) {
+                    for (Passenger passenger : booking.getPassengers()) {
+                        if (passenger.getId().equals(passengerId)) {
+                            foundBooking = booking;
+                            foundPassenger = passenger;
+                            break;
+                        }
                     }
                 }
+                if (foundBooking != null) break;
             }
-            if (foundBooking != null) break;
+        } catch (DaoException e) {
+            throw new RuntimeException(e);
         }
 
         if (foundBooking == null || foundPassenger == null) {
@@ -59,42 +72,50 @@ public class BookingService {
         }
 
         if (foundBooking.getPassengers().isEmpty()) {
-            bookings.remove(foundBooking.getId());
-            System.out.println("Booking " + foundBooking.getId() + " cancelled (all passengers removed).");
+            try {
+                dao.delete(foundBooking.getId());
+            } catch (DaoException e) {
+                throw new RuntimeException(e);
+            }
+            System.out.println("Бронювання " + foundBooking.getId() + " відмінено (пасажири видалені).");
         } else {
             if (flight != null) {
-                System.out.println("Passenger " + passengerId + " removed from booking. Flight details: " +
-                        "Flight ID: " + flight.id() +
-                        ", From: " + flight.from() +
-                        ", To: " + flight.to() +
-                        ", Date: " + flight.getDepartureTime().toLocalDate());
+                System.out.println("Пасажир " + passengerId + " відмінив бронювання. Деталі польоту: " +
+                        "Номер рейсу: " + flight.flightCode() +
+                        ", з: " + flight.from() +
+                        ", до: " + flight.to() +
+                        ", дата: " + flight.getDepartureTime().toLocalDate());
             } else {
-                System.out.println("Passenger " + passengerId + " removed from booking.");
+                System.out.println("Пасажир " + passengerId + " видалений з броювання.");
             }
         }
     }
 
     public void showBookingsForUser(String userId) {
         boolean found = false;
-        for (Booking booking : bookings.values()) {
-            for (Passenger passenger : booking.getPassengers()) {
-                if (passenger.getId().equals(userId)) {
-                    Flight flight = flightService.getFlightById(booking.getFlightId());
-                    System.out.println("Flight ID: " + flight.id() +
-                            ", From: " + flight.from() +
-                            ", To: " + flight.to() +
-                            ", Date: " + flight.getDepartureTime().toLocalDate());
-                    System.out.print("Passengers: ");
-                    for (Passenger p : booking.getPassengers()) {
-                        System.out.print(p.getFirstName() + " " + p.getLastName() + "; ");
+        try {
+            for (Booking booking : dao.readAll().values()) {
+                for (Passenger passenger : booking.getPassengers()) {
+                    if (passenger.getId().equals(userId)) {
+                        Flight flight = flightService.getFlightById(booking.getFlightId());
+                        System.out.println("Номер рейсу: " + flight.flightCode() +
+                                ", з: " + flight.from() +
+                                ", до: " + flight.to() +
+                                ", дата: " + flight.getDepartureTime().toLocalDate());
+                        System.out.print("Пасажири: ");
+                        for (Passenger p : booking.getPassengers()) {
+                            System.out.print(p.getFirstName() + " " + p.getLastName() + "; ");
+                        }
+                        System.out.println();
+                        found = true;
                     }
-                    System.out.println();
-                    found = true;
                 }
             }
+        } catch (DaoException e) {
+            throw new RuntimeException(e);
         }
         if (!found) {
-            System.out.println("No bookings found for user: " + userId);
+            System.out.println("Немає бронюваня для пасажира: " + userId);
         }
     }
 }

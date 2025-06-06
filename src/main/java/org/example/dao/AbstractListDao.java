@@ -9,14 +9,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
-public abstract class AbstractDao<T extends Identifiable> implements Dao<T> {
+public abstract class AbstractListDao<T extends Identifiable> implements ListDao<T> {
     protected final ListStorage<T> storage;
     protected final Class<T> entityClass;
 
-    protected AbstractDao(ListStorage<T> storage, Class<T> entityClass) {
+    protected AbstractListDao(ListStorage<T> storage, Class<T> entityClass) {
         this.storage = storage;
         this.entityClass = entityClass;
     }
@@ -71,18 +70,24 @@ public abstract class AbstractDao<T extends Identifiable> implements Dao<T> {
 
     @Override
     public void update(T entity) throws DaoException {
-        if (entity == null) throw new DaoException("Cannot update null "+ entityClass.getSimpleName());
-        List<T> list = safeLoad();
-        OptionalInt indexOpt = IntStream.range(0, list.size())
-                .filter(i -> list.get(i).getId().equals(entity.getId()))
-                .findFirst();
+        if (entity == null) {
+            throw new DaoException("Cannot update null " + entityClass.getSimpleName());
+        }
 
-        if (indexOpt.isPresent()) {
-            list.set(indexOpt.getAsInt(), entity);
-        } else {
+        List<T> oldList = safeLoad();
+
+        boolean found = oldList.stream()
+                .anyMatch(e -> e.getId().equals(entity.getId()));
+
+        if (!found) {
             throw new DaoException(entityClass.getSimpleName() + " with id " + entity.getId() + " not found");
         }
-        safeSave(list);
+
+        List<T> updatedList = oldList.stream()
+                .map(e -> e.getId().equals(entity.getId()) ? entity : e)
+                .toList();
+
+        safeSave(updatedList);
     }
 
     @Override

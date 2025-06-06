@@ -311,15 +311,12 @@ public class FlightDaoTest {
         @Test
         @DisplayName("Success case")
         void testUpdate_success() throws Exception {
-            List<Flight> flights = new ArrayList<>();
-            flights.add(flight);
-            when(storage.loadData()).thenReturn(flights);
+            when(storage.loadData()).thenReturn(List.of(flight));
 
             Flight updatedFlight = flight.withAvailableSeats(100);
 
             dao.update(updatedFlight);
 
-            assertEquals(100, flights.getFirst().availableSeats());
             verify(storage).saveData(argThat(list ->
                     list.size() == 1 &&
                             list.get(0).getId().equals("FL123") &&
@@ -386,24 +383,13 @@ public class FlightDaoTest {
         @Test
         @DisplayName("Update should replace all fields except id")
         void testUpdate_replacesAllFieldsExceptId() throws Exception {
-            Flight original = new Flight("FL123", "", "Kyiv", "Warsaw",
-                    LocalDateTime.of(2025, 6, 1, 10, 0),
-                    LocalDateTime.of(2025, 6, 1, 12, 0), 120);
-
-            List<Flight> flights = new ArrayList<>(List.of(original));
-            when(storage.loadData()).thenReturn(flights);
+            when(storage.loadData()).thenReturn(List.of(flight));
 
             Flight updated = new Flight("FL123", "", "Lviv", "London",
                     LocalDateTime.of(2025, 6, 5, 8, 0),
                     LocalDateTime.of(2025, 6, 5, 11, 0), 95);
 
             dao.update(updated);
-
-            assertAll(
-                    () -> assertEquals("Lviv", flights.getFirst().from()),
-                    () -> assertEquals("London", flights.getFirst().to()),
-                    () -> assertEquals(95, flights.getFirst().availableSeats())
-            );
 
             verify(storage).saveData(argThat(list ->
                     list.size() == 1 &&
