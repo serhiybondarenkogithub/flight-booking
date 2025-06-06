@@ -6,35 +6,40 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class Flight implements Identifiable, Serializable {
-    private String id;
-    private String destination;
-    private LocalDateTime departureTime;
-    private int availableSeats;
+public record Flight(
+        String id,
+        String flightCode,
+        String from,
+        String to,
+        LocalDateTime departureDateTime,
+        LocalDateTime arrivalDateTime,
+        int availableSeats
+) implements Identifiable, Serializable {
 
-    public Flight(String id, String destination, LocalDateTime departureTime, int availableSeats) {
-        this.id = id;
-        this.destination = destination;
-        this.departureTime = departureTime;
-        this.availableSeats = availableSeats;
+    public Flight {
+        if (id == null || flightCode == null || from == null || to == null || departureDateTime == null || arrivalDateTime == null)
+            throw new IllegalArgumentException("Flight parameters cannot be null");
+
+        validateSeats(availableSeats);
     }
 
-    public String getId() { return id; }
-    public String getDestination() { return destination; }
-    public LocalDateTime getDepartureTime() { return departureTime; }
-    public int getAvailableSeats() { return availableSeats; }
-    public void setAvailableSeats(int availableSeats) { this.availableSeats = availableSeats; }
+    public Flight withAvailableSeats(int newSeats) {
+        validateSeats(newSeats);
+        return new Flight(id, flightCode, from, to, departureDateTime, arrivalDateTime, newSeats);
+    }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Flight)) return false;
-        Flight flight = (Flight) o;
-        return Objects.equals(id, flight.id);
+    private void validateSeats(int seats) {
+        if (seats < 0) {
+            throw new IllegalArgumentException("Available seats cannot be negative");
+        }
+    }
+
+    public LocalDateTime getDepartureTime() {
+        return departureDateTime;
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(id);
+    public String getId() {
+        return id;
     }
 }

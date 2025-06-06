@@ -24,12 +24,17 @@ public class Console {
                 switch (choice) {
                     case 1:
                         flightController.showBoard();
+                        switch (choice) {
+                            case 1:
+                        }
                         break;
                     case 2:
-                        flightController.showFlightInfo(scanner);
+                        System.out.print("Введіть код рейсу: ");
+                        String flightCode = scanner.nextLine();
+                        flightController.showFlightInfo(flightCode, scanner);
                         break;
                     case 3:
-                        bookingController.searchAndBook(scanner);
+                        bookingController.searchAndBook();
                         break;
                     case 4:
                         bookingController.cancelBooking(scanner);

@@ -3,28 +3,28 @@ package org.example.dao.storage;
 import org.example.exception.StorageException;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class FileListStorage<T> implements ListStorage<T> {
+public class FileMapStorage<T> implements MapStorage<T> {
     private final File file;
 
-    public FileListStorage(File file) {
+    public FileMapStorage(File file) {
         if (file == null) throw new IllegalArgumentException("File cannot be null");
         this.file = file;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<T> loadData() throws StorageException {
+    public Map<String, T> loadData() throws StorageException {
         if (!file.exists()) {
             throw new StorageException("File not found: " + file.getName());
         }
 
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
             Object obj = in.readObject();
-            if (obj instanceof List<?> list) {
-                return (List<T>) list;
+            if (obj instanceof Map<?, ?> map) {
+                return (Map<String, T>) map;
             }
             else throw new StorageException("Invalid data format in file");
 
@@ -33,7 +33,7 @@ public class FileListStorage<T> implements ListStorage<T> {
         }
     }
     @Override
-    public void saveData(List<T> data) throws StorageException {
+    public void saveData(Map<String, T> data) throws StorageException {
         if (data == null) {
             throw new StorageException("Data to save cannot be null");
         }

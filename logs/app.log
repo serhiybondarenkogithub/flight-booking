@@ -1,0 +1,4 @@
+2025-06-06 17:06:27 INFO  org.example.service.FlightService - ⚠️ Test log: FlightService.initData called
+2025-06-06 17:08:05 DEBUG org.example.service.FlightService - Read 30 flights
+2025-06-06 18:25:55 INFO  org.example.service.FlightService - Searching flights: from=Kyiv, to=Brussels, date=2025-06-07, passengers=1
+2025-06-06 18:26:16 DEBUG org.example.service.FlightService - Updating flight id=537e78ea-81d1-4281-bd58-fcf1ea462930, code=NT3929
