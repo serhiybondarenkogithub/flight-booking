@@ -1,8 +1,8 @@
 package org.example.service;
 
-import org.example.dao.ListDao;
 import org.example.dao.MapDao;
 import org.example.exception.DaoException;
+import org.example.exception.ServiceException;
 import org.example.model.entities.Booking;
 import org.example.model.entities.Flight;
 import org.example.model.entities.Passenger;
@@ -26,7 +26,11 @@ public class BookingService {
             return;
         }
         Flight updatedFlight = flight.withAvailableSeats(flight.availableSeats() - passengers.size());
-        flightService.updateFlight(updatedFlight);
+        try {
+            flightService.updateFlight(updatedFlight);
+        } catch (ServiceException e) {
+            throw new RuntimeException(e);
+        }
         String bookingId = UUID.randomUUID().toString();
         Booking booking = new Booking(bookingId, flight.id(), passengers);
         try {
@@ -65,10 +69,19 @@ public class BookingService {
 
         foundBooking.getPassengers().remove(foundPassenger);
 
-        Flight flight = flightService.getFlightById(flightId);
+        Flight flight = null;
+        try {
+            flight = flightService.findFlightById(flightId);
+        } catch (ServiceException e) {
+            throw new RuntimeException(e);
+        }
         if (flight != null) {
             Flight updatedFlight = flight.withAvailableSeats(flight.availableSeats() + 1);
-            flightService.updateFlight(updatedFlight);
+            try {
+                flightService.updateFlight(updatedFlight);
+            } catch (ServiceException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         if (foundBooking.getPassengers().isEmpty()) {
@@ -97,7 +110,12 @@ public class BookingService {
             for (Booking booking : dao.readAll().values()) {
                 for (Passenger passenger : booking.getPassengers()) {
                     if (passenger.getId().equals(userId)) {
-                        Flight flight = flightService.getFlightById(booking.getFlightId());
+                        Flight flight = null;
+                        try {
+                            flight = flightService.findFlightById(booking.getFlightId());
+                        } catch (ServiceException e) {
+                            throw new RuntimeException(e);
+                        }
                         System.out.println("Номер рейсу: " + flight.flightCode() +
                                 ", з: " + flight.from() +
                                 ", до: " + flight.to() +

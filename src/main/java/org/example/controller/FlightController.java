@@ -1,6 +1,6 @@
 package org.example.controller;
 
-import org.example.console.Console;
+import org.example.exception.ServiceException;
 import org.example.model.entities.Flight;
 import org.example.service.FlightService;
 
@@ -18,11 +18,15 @@ public class FlightController {
     }
 
     private List<Flight> getFutureFlights() {
-        return flightService.readAll().stream()
-                .filter(f -> "Kyiv".equalsIgnoreCase(f.from())
-                        && !f.departureDateTime().isBefore(LocalDateTime.now())
-                        && !f.departureDateTime().isAfter(LocalDateTime.now().plusHours(24)))
-                .toList();
+        try {
+            return flightService.getAllFlights().stream()
+                    .filter(f -> "Kyiv".equalsIgnoreCase(f.from())
+                            && !f.departureDateTime().isBefore(LocalDateTime.now())
+                            && !f.departureDateTime().isAfter(LocalDateTime.now().plusHours(24)))
+                    .toList();
+        } catch (ServiceException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void showBoard() {

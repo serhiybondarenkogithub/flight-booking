@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import org.example.exception.ServiceException;
 import org.example.model.entities.Flight;
 import org.example.model.entities.Passenger;
 import org.example.service.BookingService;
@@ -23,7 +24,12 @@ public class BookingController {
     public void cancelBooking(Scanner scanner) {
         System.out.print("Введіть код рейсу: ");
         String flightCode = scanner.nextLine();
-        List<Flight> found = flightService.getFlightsByFlightCode(flightCode);
+        List<Flight> found = null;
+        try {
+            found = flightService.findAllByCode(flightCode);
+        } catch (ServiceException e) {
+            throw new RuntimeException(e);
+        }
         if (found.isEmpty()) {
             System.out.println("Рейс не знайдено.");
             System.out.println("Повертаємось до головного меню...");
@@ -64,7 +70,12 @@ public class BookingController {
         System.out.print("Введіть число пасажирів: ");
         int passengerCount = Integer.parseInt(scanner.nextLine());
 
-        List<Flight> found = flightService.getFlightsByParams(from, to, java.time.LocalDate.parse(date), passengerCount);
+        List<Flight> found = null;
+        try {
+            found = flightService.searchFlights(from, to, java.time.LocalDate.parse(date), passengerCount);
+        } catch (ServiceException e) {
+            throw new RuntimeException(e);
+        }
         if (found.isEmpty()) {
             System.out.println("Рейс не знайдено.");
             System.out.println("Повертаємось до головного меню...");
