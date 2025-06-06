@@ -35,7 +35,7 @@ public class BookingController {
             System.out.println("Повертаємось до головного меню...");
             return;
         }
-        FlightController.printFligsWithIndexes(found);
+        FlightController.printFlightsWithIndexes(found);
         System.out.println("Введіть номер рейсу (число): ");
         int choice = Integer.parseInt(scanner.nextLine());
         if (choice == 0) {
@@ -81,7 +81,7 @@ public class BookingController {
             System.out.println("Повертаємось до головного меню...");
             return;
         }
-        FlightController.printFligsWithIndexes(found);
+        FlightController.printFlightsWithIndexes(found);
         System.out.println("0. Повернутися до головного меню");
         System.out.print("Ореріть рейс для бронювання (число): ");
         int choice = Integer.parseInt(scanner.nextLine());

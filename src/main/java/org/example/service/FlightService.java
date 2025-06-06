@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 public class FlightService {
     private final ListDao<Flight> dao;
     private static final Logger logger = LoggerFactory.getLogger(FlightService.class);
-    private static final String SERVICE = "FlightService";
+    private static final String SERVICE = FlightService.class.getSimpleName();
 
     public FlightService(ListDao<Flight> dao) {
         this.dao = dao;

@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import org.example.exception.ControllerException;
 import org.example.exception.ServiceException;
 import org.example.model.entities.Flight;
 import org.example.service.FlightService;
@@ -12,12 +13,13 @@ import java.util.Scanner;
 public class FlightController {
 
     private final FlightService flightService;
+    private static final String CONTROLLER = FlightController.class.getSimpleName();
 
     public FlightController(FlightService flightService) {
         this.flightService = flightService;
     }
 
-    private List<Flight> getFutureFlights() {
+    private List<Flight> getFutureFlights() throws ControllerException {
         try {
             return flightService.getAllFlights().stream()
                     .filter(f -> "Kyiv".equalsIgnoreCase(f.from())
@@ -25,48 +27,58 @@ public class FlightController {
                             && !f.departureDateTime().isAfter(LocalDateTime.now().plusHours(24)))
                     .toList();
         } catch (ServiceException e) {
-            throw new RuntimeException(e);
+            throw new ControllerException(CONTROLLER + ": " + e.getMessage(), e);
         }
     }
 
     public void showBoard() {
-        List<Flight> flights = getFutureFlights();
-        if (flights.isEmpty()) {
-            System.out.println("Відсутні польоти найближчі 24 години");
-        } else {
-            printFlightBoard(flights);
+        List<Flight> flights = null;
+        try {
+            flights = getFutureFlights();
+            if (flights.isEmpty()) {
+                System.out.println("Відсутні польоти найближчі 24 години");
+            } else {
+                printFlightBoard(flights);
+            }
+        } catch (ControllerException e) {
+            System.out.println(e.getMessage());
         }
     }
 
     public void showFlightInfo(String flightCode, Scanner scanner) {
-        List<Flight> flights = getFutureFlights();
-        if (flights.isEmpty()) {
-            System.out.println("Відсутні польоти найближчі 24 години");
-        } else {
-            List<Flight> search = flights.stream().filter(f -> f.flightCode().equals(flightCode)).toList();
-            if (search.size() == 1) {
-                printFlightDetails(search.getFirst());
-            } else if (search.size() > 1) {
-                System.out.println("Знайдено рейсів: " + search.size());
-                printFligsWithIndexes(search);
-                System.out.println("Оберіть за індексом: ");
-                String input = scanner.nextLine();
-                try {
-                    int index = Integer.parseInt(input);
-
-                    if (index > 0 && index <= search.size()) {
-                        Flight flight = search.get(index - 1);
-                        printFlightDetails(flight);
-                    } else {
-                        System.out.println("❌ Некоректний індекс. Має бути від 1 до " + (search.size()));
-                    }
-
-                } catch (NumberFormatException e) {
-                    System.out.println("❌ Ви ввели не число.");
-                }
+        List<Flight> flights;
+        try {
+            flights = getFutureFlights();
+            if (flights.isEmpty()) {
+                System.out.println("Відсутні польоти найближчі 24 години");
             } else {
-                System.out.println("Рейс не знайдено");
+                List<Flight> search = flights.stream().filter(f -> f.flightCode().equals(flightCode)).toList();
+                if (search.size() == 1) {
+                    printFlightDetails(search.getFirst());
+                } else if (search.size() > 1) {
+                    System.out.println("Знайдено рейсів: " + search.size());
+                    printFlightsWithIndexes(search);
+                    System.out.println("Оберіть за індексом: ");
+                    String input = scanner.nextLine();
+                    try {
+                        int index = Integer.parseInt(input);
+
+                        if (index > 0 && index <= search.size()) {
+                            Flight flight = search.get(index - 1);
+                            printFlightDetails(flight);
+                        } else {
+                            System.out.println("❌ Некоректний індекс. Має бути від 1 до " + (search.size()));
+                        }
+
+                    } catch (NumberFormatException e) {
+                        System.out.println("❌ Ви ввели не число.");
+                    }
+                } else {
+                    System.out.println("Рейс не знайдено");
+                }
             }
+        } catch (ControllerException e) {
+            System.out.println(e.getMessage());
         }
         System.out.println("Returning to main menu...");
     }
@@ -74,13 +86,11 @@ public class FlightController {
     public static void printFlightBoard(List<Flight> flights) {
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
-        // Заголовок
         System.out.printf("%-10s %-20s %-10s %-10s%n",
                 "FLIGHT", "ROUTE", "DEPART", "ARRIVE");
 
         System.out.println("=".repeat(55));
 
-        // Вивід рейсів
         for (Flight flight : flights) {
             System.out.printf("%-10s %-20s %-10s %-10s%n",
                     flight.flightCode(),
@@ -90,16 +100,14 @@ public class FlightController {
         }
     }
 
-    public static void printFligsWithIndexes(List<Flight> flights) {
+    public static void printFlightsWithIndexes(List<Flight> flights) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-        // Заголовок
         System.out.printf("%-4s %-10s %-20s %-17s %-17s %-5s%n",
                 "#", "FLIGHT", "ROUTE", "DEPARTURE", "ARRIVAL", "SEATS");
 
         System.out.println("=".repeat(80));
 
-        // Вивід кожного рейсу з індексом
         int index = 1;
         for (Flight flight : flights) {
             System.out.printf("%-4d %-10s %-20s %-17s %-17s %-5d%n",
